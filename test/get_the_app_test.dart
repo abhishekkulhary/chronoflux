@@ -52,4 +52,5 @@ void main() {
     expect(find.textContaining('v1.2.0 · 1.0 MB'), findsNWidgets(2));
     expect(find.textContaining('Not published yet'), findsNWidgets(2));
   });
+
 }

@@ -10,6 +10,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/neon_palette.dart';
 import '../../../core/utils/duration_format.dart';
 import '../../get_the_app/get_the_app_screen.dart';
+import '../../get_the_app/get_the_app_strings.dart';
 import '../../history/history_screen.dart';
 import '../../settings/settings_screen.dart';
 import '../application/timer_providers.dart';
@@ -145,7 +146,7 @@ class _TopBar extends StatelessWidget {
           if (kIsWeb) ...[
             NeonIconButton(
               icon: Icons.download_rounded,
-              tooltip: 'Get the app',
+              tooltip: GetTheAppStrings.of(context).getTheApp,
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => const GetTheAppScreen(appName: 'Chronoflux'),

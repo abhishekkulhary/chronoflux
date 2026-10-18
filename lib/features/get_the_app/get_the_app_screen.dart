@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'get_the_app_strings.dart';
 import 'github_releases.dart';
 
 /// Lists the native builds from the latest GitHub release. Shown from the web
@@ -27,8 +28,9 @@ class _GetTheAppScreenState extends State<GetTheAppScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final strings = GetTheAppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Get ${widget.appName}')),
+      appBar: AppBar(title: Text(strings.title(widget.appName))),
       body: FutureBuilder<LatestRelease?>(
         future: _latest,
         builder: (context, snapshot) {
@@ -41,7 +43,7 @@ class _GetTheAppScreenState extends State<GetTheAppScreen> {
                 padding: const EdgeInsets.all(20),
                 children: [
                   Text(
-                    '${widget.appName} also runs as a native app. Pick your platform:',
+                    strings.intro(widget.appName),
                     style: theme.textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 16),
@@ -54,18 +56,14 @@ class _GetTheAppScreenState extends State<GetTheAppScreen> {
                       releasesUrl: _releases.releasesUrl,
                     ),
                   const SizedBox(height: 8),
-                  Text(
-                    'macOS builds are unsigned: on first launch, allow the app under '
-                    'System Settings › Privacy & Security.',
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  Text(strings.macNote, style: theme.textTheme.bodySmall),
                   const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
                       onPressed: () => _open(_releases.releasesUrl),
                       icon: const Icon(Icons.open_in_new),
-                      label: Text(release == null ? 'Releases on GitHub' : 'All releases · latest ${release.tag}'),
+                      label: Text(release == null ? strings.releasesOnGitHub : strings.allReleases(release.tag)),
                     ),
                   ),
                 ],
@@ -95,24 +93,25 @@ class _PlatformTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = GetTheAppStrings.of(context);
     final asset = release?.assets[platform];
     final isCurrent = DownloadPlatform.current == platform;
     final status = loading
-        ? 'Checking the latest release…'
+        ? strings.checking
         : asset != null
             ? '${release!.tag} · ${asset.sizeLabel}'
-            : 'Not published yet';
+            : strings.notPublished;
 
     final button = asset != null && isCurrent
         ? FilledButton.icon(
             onPressed: () => onOpen(asset.downloadUrl),
             icon: const Icon(Icons.download),
-            label: const Text('Download'),
+            label: Text(strings.download),
           )
         : OutlinedButton.icon(
             onPressed: loading ? null : () => onOpen(asset?.downloadUrl ?? releasesUrl),
             icon: Icon(asset != null ? Icons.download : Icons.open_in_new),
-            label: Text(asset != null ? 'Download' : 'Releases'),
+            label: Text(asset != null ? strings.download : strings.releases),
           );
 
     return Card(
@@ -132,7 +131,7 @@ class _PlatformTile extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(platform.label, style: Theme.of(context).textTheme.titleMedium),
-                      if (isCurrent) const Chip(label: Text('Your device'), visualDensity: VisualDensity.compact),
+                      if (isCurrent) Chip(label: Text(strings.yourDevice), visualDensity: VisualDensity.compact),
                     ],
                   ),
                   Text('${platform.format} · $status', style: Theme.of(context).textTheme.bodySmall),
