@@ -54,3 +54,9 @@ app.*.map.json
 .claude/
 .qodo/
 .history/
+
+# Copies the Nextcloud sync client makes of Xcode bundles ("Runner 2.xcodeproj")
+ios/Runner [0-9]*.xcodeproj/
+ios/Runner [0-9]*.xcworkspace/
+macos/Runner [0-9]*.xcodeproj/
+macos/Runner [0-9]*.xcworkspace/
