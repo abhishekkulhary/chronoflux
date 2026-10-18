@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Chronoflux
+Comment=A futuristic Pomodoro timer
+Exec=chronoflux
+Icon=chronoflux
+Terminal=false
+Categories=Utility;Office;ProjectManagement;
+Keywords=pomodoro;timer;focus;productivity;
+StartupWMClass=Chronoflux

@@ -1,0 +1,184 @@
+# Builds native apps for Android, Windows, macOS and Linux and attaches them to a
+# GitHub Release. Trigger by pushing a tag:   git tag v1.0.0 && git push origin v1.0.0
+# or run it manually from the Actions tab with a tag name.
+#
+# Asset names matter: the web build's "Get the app" screen maps them to platforms
+# (see lib/features/get_the_app/github_releases.dart → DownloadPlatform.fromAssetName).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Version tag to create, e.g. v1.0.0
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: 3.47.7
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      # A stable release key lets each APK install over the previous one.
+      # Without the secrets the build falls back to a throwaway debug key
+      # (see android/app/build.gradle.kts and README → Android signing).
+      - name: Configure release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64$KEYSTORE_PASSWORD$KEY_ALIAS$KEY_PASSWORD" ]; then
+            echo "::warning title=Unsigned APK::ANDROID_KEYSTORE_* secrets not set; signing with a debug key. Releases won't update in place."
+            exit 0
+          fi
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::Set all four secrets: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD."
+            exit 1
+          fi
+          KEYSTORE="$RUNNER_TEMP/release.jks"
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > "$KEYSTORE"
+          {
+            echo "storeFile=$KEYSTORE"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+      - name: Build APK
+        run: |
+          flutter build apk --release \
+            --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+          mv build/app/outputs/flutter-apk/app-release.apk chronoflux-android.apk
+          # Log the signing certificate so consecutive releases can be compared.
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          "$APKSIGNER" verify --print-certs chronoflux-android.apk | grep -E 'DN|SHA-256'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: android
+          path: chronoflux-android.apk
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Build
+        run: |
+          flutter build windows --release \
+            --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+      # Ship the MSVC runtime next to the exe so it starts on machines without
+      # the Visual C++ Redistributable installed.
+      - name: Package ZIP
+        run: |
+          RELEASE=build/windows/x64/runner/Release
+          cp /c/Windows/System32/{msvcp140.dll,vcruntime140.dll,vcruntime140_1.dll} "$RELEASE/"
+          7z a -tzip chronoflux-windows-x64.zip "./$RELEASE/*"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows
+          path: chronoflux-windows-x64.zip
+          if-no-files-found: error
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Build
+        run: |
+          flutter build macos --release \
+            --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+      # Ad-hoc signed (no Apple Developer certificate), packaged as a
+      # drag-to-Applications DMG. hdiutil is occasionally flaky on CI, so retry.
+      - name: Package DMG
+        run: |
+          APP=$(find build/macos/Build/Products/Release -maxdepth 1 -name '*.app' | head -n 1)
+          mkdir -p dmg && cp -R "$APP" dmg/ && ln -s /Applications dmg/Applications
+          for attempt in 1 2 3; do
+            hdiutil create -volname "Chronoflux" -srcfolder dmg -ov -format UDZO chronoflux-macos.dmg && break
+            echo "hdiutil failed (attempt $attempt), retrying…"; sleep 10
+          done
+          test -f chronoflux-macos.dmg
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos
+          path: chronoflux-macos.dmg
+          if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Build
+        run: |
+          flutter build linux --release \
+            --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+          tar -czf chronoflux-linux-x64.tar.gz -C build/linux/x64/release/bundle .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux
+          path: chronoflux-linux-x64.tar.gz
+          if-no-files-found: error
+
+  release:
+    needs: [android, windows, macos, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ env.TAG }}
+          name: Chronoflux ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/*
