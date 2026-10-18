@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_timers/data/session_repository.dart';
-import 'package:pomodoro_timers/data/settings_repository.dart';
-import 'package:pomodoro_timers/features/timer/domain/session_phase.dart';
-import 'package:pomodoro_timers/features/timer/domain/session_record.dart';
-import 'package:pomodoro_timers/features/timer/application/ticker.dart';
-import 'package:pomodoro_timers/features/timer/application/timer_providers.dart';
-import 'package:pomodoro_timers/features/timer/presentation/timer_screen.dart';
-import 'package:pomodoro_timers/core/theme/neon_theme.dart';
-import 'package:pomodoro_timers/services/notification_service.dart';
-import 'package:pomodoro_timers/services/sound_service.dart';
+import 'package:chronoflux/data/session_repository.dart';
+import 'package:chronoflux/data/settings_repository.dart';
+import 'package:chronoflux/features/timer/domain/session_phase.dart';
+import 'package:chronoflux/features/timer/domain/session_record.dart';
+import 'package:chronoflux/features/timer/application/ticker.dart';
+import 'package:chronoflux/features/timer/application/timer_providers.dart';
+import 'package:chronoflux/features/timer/presentation/timer_screen.dart';
+import 'package:chronoflux/core/theme/neon_theme.dart';
+import 'package:chronoflux/services/notification_service.dart';
+import 'package:chronoflux/services/sound_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Keeps the widget tests off the audio platform channels.

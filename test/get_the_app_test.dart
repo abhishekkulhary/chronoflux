@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:pomodoro_timers/features/get_the_app/get_the_app_screen.dart';
-import 'package:pomodoro_timers/features/get_the_app/github_releases.dart';
+import 'package:chronoflux/features/get_the_app/get_the_app_screen.dart';
+import 'package:chronoflux/features/get_the_app/github_releases.dart';
 
 GitHubReleases _releases(int status, [Map<String, dynamic>? body]) => GitHubReleases(
       repository: 'owner/app',

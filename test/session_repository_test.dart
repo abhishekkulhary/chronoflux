@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:pomodoro_timers/data/session_repository.dart';
-import 'package:pomodoro_timers/features/timer/domain/session_phase.dart';
-import 'package:pomodoro_timers/features/timer/domain/session_record.dart';
+import 'package:chronoflux/data/session_repository.dart';
+import 'package:chronoflux/features/timer/domain/session_phase.dart';
+import 'package:chronoflux/features/timer/domain/session_record.dart';
 
 void main() {
   late Directory dir;

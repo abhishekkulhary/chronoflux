@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pomodoro_timers/features/timer/application/pomodoro_engine.dart';
-import 'package:pomodoro_timers/features/timer/application/session_effects.dart';
-import 'package:pomodoro_timers/features/timer/application/ticker.dart';
-import 'package:pomodoro_timers/features/timer/domain/pomodoro_config.dart';
-import 'package:pomodoro_timers/features/timer/domain/session_phase.dart';
-import 'package:pomodoro_timers/features/timer/domain/timer_status.dart';
+import 'package:chronoflux/features/timer/application/pomodoro_engine.dart';
+import 'package:chronoflux/features/timer/application/session_effects.dart';
+import 'package:chronoflux/features/timer/application/ticker.dart';
+import 'package:chronoflux/features/timer/domain/pomodoro_config.dart';
+import 'package:chronoflux/features/timer/domain/session_phase.dart';
+import 'package:chronoflux/features/timer/domain/timer_status.dart';
 
 class RecordingEffects implements SessionEffects {
   final List<({SessionPhase phase, DateTime endsAt})> scheduled = [];
