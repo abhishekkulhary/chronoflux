@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chronoflux — a neon Pomodoro focus timer</title>
+  <meta name="description" content="A Pomodoro timer with a glowing dial that changes colour with every phase. Web, Android, Windows, macOS and Linux.">
+  <meta name="theme-color" content="#04060F">
+  <meta property="og:title" content="Chronoflux">
+  <meta property="og:description" content="A Pomodoro timer with a glowing dial that changes colour with every phase. Web, Android, Windows, macOS and Linux.">
+  <meta property="og:image" content="img/cf-focus.jpg">
+  <link rel="icon" type="image/png" href="img/icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="deco-aurora">
+  <div class="backdrop" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="#top"><img src="img/icon.png" alt="" width="30" height="30"> Chronoflux</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#get">Download</a>
+      <a class="btn" href="app/">Open web app</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Web · Android · Windows · macOS · Linux</p>
+        <h1>Focus that <em>glows.</em></h1>
+        <p class="lead">A Pomodoro timer with a neon dial: 25 minutes of focus, a short break, and a longer one after every four sessions. The whole interface shifts colour with each phase.</p>
+        <div class="cta">
+          <a class="btn" id="open-web" href="app/">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            Open the web app
+          </a>
+          <a class="btn btn-ghost" href="#get">Download the app</a>
+        </div>
+        <p class="meta" id="release-meta">Free · open source · works offline</p>
+      </div>
+      <figure class="phone"><img src="img/cf-focus.jpg" alt="Chronoflux timer counting down a focus session" width="750" height="1624"></figure>
+    </section>
+
+    <section id="features">
+      <h2><span class="idx">01</span>What it does</h2>
+      <div class="cards">
+        <article class="card"><div class="dot"></div><h3>Three phases, three colours</h3><p>Electric blue for focus, mint for a short break, magenta for the long break — you can tell where you are from across the room.</p></article>
+        <article class="card"><div class="dot"></div><h3>Tuned to how you work</h3><p>Set the focus and break lengths and how many sessions come before a long break. Breaks, and the next session, can start on their own.</p></article>
+        <article class="card"><div class="dot"></div><h3>History that adds up</h3><p>Every finished session is recorded: today&#x27;s count sits on the dial, and the history charts your focused time.</p></article>
+        <article class="card"><div class="dot"></div><h3>Keyboard first on desktop</h3><p>Space to start or pause, R to reset, S to skip. Notifications, a chime and haptics tell you when a phase ends.</p></article>
+      </div>
+    </section>
+
+    <section class="gallery" aria-label="Screenshots">
+      <figure><div class="phone"><img src="img/cf-break.jpg" alt="Short break in mint" loading="lazy" width="750" height="1624"></div><figcaption>Short break</figcaption></figure>
+      <figure><div class="phone"><img src="img/cf-longbreak.jpg" alt="Long break in magenta" loading="lazy" width="750" height="1624"></div><figcaption>Long break</figcaption></figure>
+      <figure><div class="phone"><img src="img/cf-settings.jpg" alt="Interval and flow settings" loading="lazy" width="750" height="1624"></div><figcaption>Settings</figcaption></figure>
+    </section>
+
+    <section id="privacy" class="privacy">
+      <h2><span class="idx">02</span>No account, no tracking</h2>
+      <p>Sessions and settings are stored on your device. Chronoflux has no account, no analytics and makes no network requests beyond loading the page.</p>
+    </section>
+
+    <section id="get">
+      <h2><span class="idx">03</span>Get Chronoflux</h2>
+      <p class="section-lead">Use it right here in your browser, or install it. Every GitHub release carries
+        builds for Android, Windows, macOS and Linux.</p>
+      <div class="platforms">
+        <a class="platform web" id="open-web-2" href="app/"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg><strong>Web</strong><span>Open in your browser</span></a>
+        <a class="platform" id="dl-android" href="https://github.com/__REPO__/releases/latest"><svg viewBox="0 0 24 24"><rect x="5" y="9" width="14" height="10" rx="2"/><path d="M8 9a4 4 0 0 1 8 0M8 5 7 3.5M16 5l1-1.5M9 19v2M15 19v2"/></svg><strong>Android</strong><span>APK</span></a>
+        <a class="platform" id="dl-windows" href="https://github.com/__REPO__/releases/latest"><svg viewBox="0 0 24 24"><path d="M3 5.5 10.5 4.5v7H3zM12.5 4.2 21 3v8.5h-8.5zM3 13h7.5v7L3 19zM12.5 13H21v8l-8.5-1.2z"/></svg><strong>Windows</strong><span>ZIP · x64</span></a>
+        <a class="platform" id="dl-macos" href="https://github.com/__REPO__/releases/latest"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><strong>macOS</strong><span>DMG · Universal</span></a>
+        <a class="platform" id="dl-linux" href="https://github.com/__REPO__/releases/latest"><svg viewBox="0 0 24 24"><path d="M4 6l5 5-5 5M12 18h8"/></svg><strong>Linux</strong><span>tar.gz · x64</span></a>
+      </div>
+      <div class="notes">
+        <p><strong>Android:</strong> open the downloaded APK and allow installing from your browser when asked. Updates install over the previous version.</p>
+        <p><strong>iPhone and iPad:</strong> there is no App Store build — open the web app in Safari and use “Add to Home Screen”.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© <span id="year"></span> Abhishek Choudhary</span>
+    <!-- __BUILD__ / __BUILD_SHA__ are filled in by the deploy workflow. -->
+    <span>Built from <a href="https://github.com/__REPO__/commit/__BUILD_SHA__">__BUILD__</a></span>
+    <a href="https://github.com/__REPO__">Source on GitHub</a>
+    <a href="https://abhishekkulhary.github.io/portfolio/">Portfolio</a>
+  </footer>
+
+  <script>window.APP_REPO = '__REPO__'; window.APP_SLUG = 'chronoflux';</script>
+  <script src="main.js"></script>
+</body>
+</html>

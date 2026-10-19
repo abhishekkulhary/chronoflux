@@ -36,22 +36,36 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
-      # Base href follows the repository name (/portfolio/). CanvasKit is
+      # The web app is served from /<repository>/app/, under the landing page. CanvasKit is
       # self-hosted (--no-web-resources-cdn) so the page makes no third-party requests.
       - name: Build web
         run: |
           flutter build web --release \
-            --base-href "/${{ github.event.repository.name }}/" \
+            --base-href "/${{ github.event.repository.name }}/app/" \
             --no-web-resources-cdn \
             --dart-define=GITHUB_REPOSITORY="${{ github.repository }}" \
             --dart-define=APP_VERSION="${GITHUB_SHA::7}"
 
-      # GitHub Pages serves 404.html for unknown paths; fall back to the app.
-      - run: cp build/web/index.html build/web/404.html
+      # The landing page (site/) sits at the root and the web app under app/.
+      # Fonts, the icon and screenshots are copied in so they live in one place
+      # only; __REPO__ and the build commit are filled in here.
+      - name: Assemble site
+        run: |
+          mkdir -p _site/img _site/fonts _site/app
+          cp -R site/. _site/
+          cp -R build/web/. _site/app/
+          cp docs/screenshots/*.jpg _site/img/
+          cp assets/icon/icon.png _site/img/icon.png
+          cp 'assets/fonts/Orbitron[wght].ttf' _site/fonts/Orbitron.ttf
+          cp assets/fonts/Rajdhani-*.ttf _site/fonts/
+          cp assets/fonts/*.txt _site/fonts/ 2>/dev/null || true
+          sed -i "s|__REPO__|${{ github.repository }}|g; s|__BUILD_SHA__|${GITHUB_SHA}|g; s|__BUILD__|${GITHUB_SHA::7}|g" _site/index.html
+          # Unknown paths fall back to the landing page.
+          cp _site/index.html _site/404.html
 
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: build/web
+          path: _site
 
   deploy:
     needs: build
