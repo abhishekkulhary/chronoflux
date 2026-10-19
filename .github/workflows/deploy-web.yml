@@ -43,7 +43,8 @@ jobs:
           flutter build web --release \
             --base-href "/${{ github.event.repository.name }}/" \
             --no-web-resources-cdn \
-            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}" \
+            --dart-define=APP_VERSION="${GITHUB_SHA::7}"
 
       # GitHub Pages serves 404.html for unknown paths; fall back to the app.
       - run: cp build/web/index.html build/web/404.html

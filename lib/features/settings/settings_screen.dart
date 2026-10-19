@@ -6,6 +6,7 @@ import '../../core/theme/neon_palette.dart';
 import '../timer/application/timer_providers.dart';
 import '../timer/presentation/widgets/aurora_background.dart';
 import '../timer/presentation/widgets/glass_panel.dart';
+import '../get_the_app/build_stamp.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -148,6 +149,15 @@ class SettingsScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: BuildStamp(
+                        style: AppTypography.textTheme.bodySmall
+                            ?.copyWith(color: NeonSurfaces.textFaint),
+                        accent: palette.start,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

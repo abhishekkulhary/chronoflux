@@ -70,7 +70,8 @@ jobs:
         run: |
           flutter build apk --release \
             --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
-            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}" \
+            --dart-define=APP_VERSION="$TAG"
           mv build/app/outputs/flutter-apk/app-release.apk chronoflux-android.apk
           # Log the signing certificate so consecutive releases can be compared.
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
@@ -94,7 +95,8 @@ jobs:
         run: |
           flutter build windows --release \
             --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
-            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}" \
+            --dart-define=APP_VERSION="$TAG"
       # Ship the MSVC runtime next to the exe so it starts on machines without
       # the Visual C++ Redistributable installed.
       - name: Package ZIP
@@ -121,7 +123,8 @@ jobs:
         run: |
           flutter build macos --release \
             --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
-            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}" \
+            --dart-define=APP_VERSION="$TAG"
       # Ad-hoc signed (no Apple Developer certificate), packaged as a
       # drag-to-Applications DMG. hdiutil is occasionally flaky on CI, so retry.
       - name: Package DMG
@@ -156,7 +159,8 @@ jobs:
         run: |
           flutter build linux --release \
             --build-name "${TAG#v}" --build-number "${{ github.run_number }}" \
-            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}"
+            --dart-define=GITHUB_REPOSITORY="${{ github.repository }}" \
+            --dart-define=APP_VERSION="$TAG"
           tar -czf chronoflux-linux-x64.tar.gz -C build/linux/x64/release/bundle .
       - uses: actions/upload-artifact@v7
         with:
