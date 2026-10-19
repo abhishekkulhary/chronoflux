@@ -337,9 +337,33 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.timeline_rounded,
-                size: 46, color: NeonSurfaces.textFaint),
-            const SizedBox(height: 18),
+            // A lit disc in the focus colours, so the empty screen still
+            // belongs to the app rather than reading as an error.
+            Container(
+              width: 92,
+              height: 92,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: NeonSurfaces.glassFill,
+                border: Border.all(
+                  color: PhasePalette.focus.glow.withValues(alpha: 0.45),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: PhasePalette.focus.glow.withValues(alpha: 0.30),
+                    blurRadius: 32,
+                    spreadRadius: -6,
+                  ),
+                ],
+              ),
+              child: ShaderMask(
+                shaderCallback: (rect) =>
+                    PhasePalette.focus.sweep.createShader(rect),
+                child: const Icon(Icons.timeline_rounded,
+                    size: 42, color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 22),
             Text('No sessions yet',
                 style: AppTypography.textTheme.titleLarge),
             const SizedBox(height: 8),

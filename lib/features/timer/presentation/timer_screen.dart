@@ -120,13 +120,21 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // On phones three 52 px buttons left the wordmark a sliver of width, so it
+    // scaled down to near-illegible. Compact buttons give it room back.
+    final compact = MediaQuery.sizeOf(context).width < 440;
+    final buttonSize = compact ? 44.0 : 52.0;
+    final gap = compact ? 8.0 : 10.0;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: EdgeInsets.fromLTRB(compact ? 16 : 20, 12, compact ? 16 : 20, 0),
       child: Row(
         children: [
-          // Shrinks rather than overflows on narrow screens and at large
-          // system text scales.
-          Flexible(
+          _FluxMark(palette: palette),
+          const SizedBox(width: 10),
+          // Takes all the free width (a Spacer beside it used to claim half)
+          // and only shrinks when even that is not enough — narrow windows,
+          // large system text scales.
+          Expanded(
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
@@ -136,15 +144,16 @@ class _TopBar extends StatelessWidget {
                   'CHRONOFLUX',
                   maxLines: 1,
                   style: AppTypography.displaySmall(17, weight: 700)
-                      .copyWith(color: Colors.white, letterSpacing: 4),
+                      .copyWith(color: Colors.white, letterSpacing: 3),
                 ),
               ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           // The native apps are offered from the web build only.
           if (kIsWeb) ...[
             NeonIconButton(
+              size: buttonSize,
               icon: Icons.download_rounded,
               tooltip: GetTheAppStrings.of(context).getTheApp,
               onPressed: () => Navigator.of(context).push(
@@ -153,17 +162,19 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: gap),
           ],
           NeonIconButton(
+            size: buttonSize,
             icon: Icons.insights_outlined,
             tooltip: 'History',
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const HistoryScreen()),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: gap),
           NeonIconButton(
+            size: buttonSize,
             icon: Icons.tune_rounded,
             tooltip: 'Settings',
             onPressed: () => Navigator.of(context).push(
@@ -309,14 +320,30 @@ class _PhaseLabel extends StatelessWidget {
       child: Column(
         key: ValueKey(state.phase),
         children: [
-          ShaderMask(
-            shaderCallback: (rect) => palette.sweep.createShader(rect),
-            child: Text(
-              state.phase.shortLabel,
-              style: AppTypography.eyebrow.copyWith(color: Colors.white),
+          // The phase name sits in a lit capsule, tinted by the phase.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              color: palette.glow.withValues(alpha: 0.08),
+              border: Border.all(color: palette.glow.withValues(alpha: 0.45)),
+              boxShadow: [
+                BoxShadow(
+                  color: palette.glow.withValues(alpha: 0.28),
+                  blurRadius: 18,
+                  spreadRadius: -4,
+                ),
+              ],
+            ),
+            child: ShaderMask(
+              shaderCallback: (rect) => palette.sweep.createShader(rect),
+              child: Text(
+                state.phase.shortLabel,
+                style: AppTypography.eyebrow.copyWith(color: Colors.white),
+              ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
           Text(
             state.phase.tagline,
             style: AppTypography.textTheme.bodyMedium,
@@ -544,4 +571,65 @@ class _Stat extends StatelessWidget {
       ],
     );
   }
+}
+
+/// The logo mark beside the wordmark: an almost-closed ring in the phase
+/// gradient with a bright head, echoing the timer dial.
+class _FluxMark extends StatelessWidget {
+  const _FluxMark({required this.palette});
+
+  final PhasePalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 22,
+      child: CustomPaint(painter: _FluxMarkPainter(palette)),
+    );
+  }
+}
+
+class _FluxMarkPainter extends CustomPainter {
+  _FluxMarkPainter(this.palette);
+
+  final PhasePalette palette;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = size.shortestSide / 2 - 2.5;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    const start = -math.pi / 2;
+    const sweep = math.pi * 1.62;
+    canvas.drawArc(
+      rect,
+      start,
+      sweep,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round
+        ..shader = SweepGradient(
+          startAngle: start,
+          endAngle: start + sweep,
+          colors: [palette.end, palette.start],
+          transform: const GradientRotation(start),
+        ).createShader(rect),
+    );
+    final head = center +
+        Offset(math.cos(start + sweep), math.sin(start + sweep)) * radius;
+    canvas.drawCircle(
+      head,
+      4,
+      Paint()
+        ..color = palette.glow.withValues(alpha: 0.6)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+    canvas.drawCircle(head, 2.2, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(_FluxMarkPainter old) =>
+      old.palette.start != palette.start || old.palette.end != palette.end;
 }

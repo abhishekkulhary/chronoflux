@@ -141,12 +141,17 @@ class NeonIconButton extends StatelessWidget {
     required this.onPressed,
     required this.tooltip,
     this.palette,
+    this.size = 52,
   });
 
   final IconData icon;
   final VoidCallback? onPressed;
   final String tooltip;
   final PhasePalette? palette;
+
+  /// Diameter. The header uses a smaller size on phones so the wordmark keeps
+  /// its room.
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -164,11 +169,11 @@ class NeonIconButton extends StatelessWidget {
               onTap: onPressed,
               customBorder: const CircleBorder(),
               child: SizedBox(
-                width: 52,
-                height: 52,
+                width: size,
+                height: size,
                 child: Icon(
                   icon,
-                  size: 22,
+                  size: size * 0.42,
                   color: onPressed == null
                       ? NeonSurfaces.textFaint
                       : NeonSurfaces.textSecondary,
